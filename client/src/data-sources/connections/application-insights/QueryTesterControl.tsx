@@ -8,9 +8,16 @@ import Toolbar from 'react-md/lib/Toolbars';
 import Divider from 'react-md/lib/Dividers';
 import CircularProgress from 'react-md/lib/Progress/CircularProgress';
 import ApplicationInsightsApi from '../../plugins/ApplicationInsights/ApplicationInsightsApi';
+import Radio from 'react-md/lib/SelectionControls/Radio';
 
 import * as moment from 'moment';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { 
+  LineChart, Line, 
+  BarChart, Bar, 
+  PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+  ResponsiveContainer 
+} from 'recharts';
 import ConfigurationsActions from '../../../actions/ConfigurationsActions';
 import ConfigurationsStore from '../../../stores/ConfigurationsStore';
 
@@ -19,9 +26,9 @@ import TableHeader from 'react-md/lib/DataTables/TableHeader';
 import TableBody from 'react-md/lib/DataTables/TableBody';
 import TableRow from 'react-md/lib/DataTables/TableRow';
 import TableColumn from 'react-md/lib/DataTables/TableColumn';
-import TimelineComponent from '../../../components/generic/Timeline'
+import TimelineComponent from '../../../components/generic/Timeline';
 import ElementConnector from "../../../components/ElementConnector";
-import * as TimelineFormater from '../../../utils/data-formats/formats/timeline'
+import * as TimelineFormater from '../../../utils/data-formats/formats/timeline';
 import Card from "../../../components/Card/Card";
 
 interface IQueryState {
@@ -29,6 +36,7 @@ interface IQueryState {
   response: object;
   responseExpanded: boolean;
   loadingData: boolean;
+  renderAs: 'table' | 'timeline' | 'bars' | 'pie';
 }
 
 interface IQueryTesterState {
@@ -59,7 +67,8 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
         query: 'customEvents | limit 200 | summarize count() by bin(timestamp, 10m)',
         response: {},
         loadingData: false,
-        responseExpanded: true
+        responseExpanded: true,
+        renderAs: 'table'
       }
     ],
     dashboard: null
@@ -74,6 +83,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
     this.onQueryChange = this.onQueryChange.bind(this);
     this.toggleResponse = this.toggleResponse.bind(this);
     this.configurationLoaded = this.configurationLoaded.bind(this);
+    this.handleInlineChange = this.handleInlineChange.bind(this);
 
     ConfigurationsActions.loadDashboard('bot_analytics_inst');
   }
@@ -143,7 +153,8 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
           query: 'customEvents | take 5',
           response: {},
           responseExpanded: true,
-          loadingData: false
+          loadingData: false,
+          renderAs: 'table'
         });
       }
 
@@ -192,6 +203,13 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
     return moment(time).format('HH:mm');
   }
 
+  handleInlineChange(index: number, e: UIEvent) {
+    // Basically how the `SelectionControlGroup` works
+    let queries = this.state.queries;
+    queries[index].renderAs = (e.target as any).value;
+    this.setState({ queries });
+  }
+
   render() {
     const { queries } = this.state;
 
@@ -209,7 +227,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
       return rows;
     };
 
-    let formatResult = (response) => {
+    let formatTimeline = (response) => {
       const result = response &&
                      (response as any).Tables &&
                      (response as any).Tables.length > 0 &&
@@ -221,17 +239,10 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
       console.dir(rows);
 
       return rows;
-    }
+    };
 
-    let datatemp = [
-      {time: 1499677200000, value: 114},
-      {time: 1498841400000, value: 7},
-      {time: 1498036200000, value: 11},
-      {time: 1498044000000, value: 16},
-      {time: 1503390600000, value: 6},
-      {time: 1499173800000, value: 3}
-    ];
-
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    
     const queryParts = queries.map((q, i) => {
       return (
         <div key={i}>
@@ -247,25 +258,116 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
           <Button primary raised label="Go" onClick={this.submitQuery.bind(this, i)} style={{ width: 100 }} />
           <Button raised label="Toggle Results" onClick={this.toggleResponse.bind(this, i)} style={{ width: 150 }} />
           <Button raised label="Pin" onClick={this.pinToDashboard.bind(this, i)} style={{ width: 100 }} />
+          <fieldset
+            id={'fs' + i}
+            style={{
+              display: 'inline',
+              border: 'none',
+              padding: 0,
+              position: 'relative',
+              top: '6px'
+            }}
+            onChange={this.handleInlineChange.bind(this, i)}>
+            <Radio
+              id="inlineRadio1"
+              inline
+              name={'inlineRadios' + i}
+              value="table"
+              label="Table"
+              checked={q.renderAs === 'table'}
+            />
+            <Radio
+              id="inlineRadio2"
+              inline
+              name={'inlineRadios' + i}
+              value="timeline"
+              label="Timeline"
+              checked={q.renderAs === 'timeline'}
+            />
+            <Radio
+            id="inlineRadio3"
+            inline
+            name={'inlineRadios' + i}
+            value="bars"
+            label="Bars"
+            checked={q.renderAs === 'bars'}
+            />
+            <Radio
+              id="inlineRadio4"
+              inline
+              name={'inlineRadios' + i}
+              value="pie"
+              label="Pie"
+              checked={q.renderAs === 'pie'}
+            />
+          </fieldset>
           {
             q.responseExpanded &&
             (
               <div style={styles.json}>
-                <DataTable plain>
-                  <TableBody>
-                    {mapResult(q.response)}
-                  </TableBody>
-                </DataTable>
-            <Card id="myid" title="my title" subtitle="my subtitle">
-              <LineChart data={formatResult(q.response)} width={730} height={250} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <XAxis dataKey="time" tickFormatter={this.hourFormat} minTickGap={20} />
-                <YAxis/>
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              </LineChart>
-            </Card>
+                {
+                  q.renderAs === 'table' && (
+                    <DataTable plain>
+                      <TableBody>
+                        {mapResult(q.response)}
+                      </TableBody>
+                    </DataTable>
+                  ) ||
+                  q.renderAs === 'timeline' && (
+                  
+                    <Card id="myid" title="my title" subtitle="my subtitle">
+                      <LineChart 
+                        data={formatTimeline(q.response)} 
+                        width={730} 
+                        height={250} 
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <XAxis dataKey="time" tickFormatter={this.hourFormat} minTickGap={20} />
+                        <YAxis/>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                      </LineChart>
+                    </Card>
+                  ) ||
+                  q.renderAs === 'bars' && (
+                  
+                    <Card id="myid" title="my title" subtitle="my subtitle">
+                      <BarChart 
+                        data={formatTimeline(q.response)} 
+                        width={730} 
+                        height={250} 
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <XAxis />
+                        <YAxis />
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <Bar dataKey='value' fill='#8884d8'/>
+                        <Legend />
+                        <Tooltip />
+                      </BarChart>
+                    </Card>
+                  ) ||
+                  q.renderAs === 'pie' && (
+                    <Card id="myid" title="my title" subtitle="my subtitle">
+                      <PieChart width={730} height={250}>
+                        <Pie
+                          data={formatTimeline(q.response)} 
+                          cx={300} 
+                          cy={100} 
+                          outerRadius={80} 
+                          fill="#8884d8"
+                        >
+                          {
+                            formatTimeline(q.response).map((entry, index) => (
+                              <Cell label key={index} fill={COLORS[index % COLORS.length]}/>
+                              )
+                            )
+                          }
+                        </Pie>
+                      </PieChart>
+                    </Card>
+                  )
+                }
               </div>
             )
           }

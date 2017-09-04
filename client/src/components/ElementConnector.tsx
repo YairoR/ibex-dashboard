@@ -45,7 +45,7 @@ export default class ElementConnector {
         });
 
         curCol += size.w;
-        maxRowHeight = Math.max(curRowOffset + size.h, maxRowHeight);
+        maxRowHeight = Math.max(curRowOffset + size.h - (location.x > 0 ? location.x : 0), maxRowHeight);
       });
     });
 

@@ -67,7 +67,19 @@ export default class Navbar extends React.Component<any, any> {
     let pathname = '/';
     try { pathname = window.location.pathname; } catch (e) { }
 
-    let navigationItems = [];
+    let navigationItems = [
+      (
+        <ListItem
+          key={1001}
+          component={Link}
+          href={'/explorer'}
+          active={'/explorer' === pathname}
+          leftIcon={<FontIcon>{'search'}</FontIcon>}
+          tileClassName="md-list-tile--mini"
+          primaryText={name || 'Dashboard'}
+        />
+      )
+    ];
     let toolbarTitle = null;
 
     (dashboards || []).forEach((dashboard, index) => {

@@ -259,7 +259,6 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
           <Button raised label="Toggle Results" onClick={this.toggleResponse.bind(this, i)} style={{ width: 150 }} />
           <Button raised label="Pin" onClick={this.pinToDashboard.bind(this, i)} style={{ width: 100 }} />
           <fieldset
-            id={'fs' + i}
             style={{
               display: 'inline',
               border: 'none',
@@ -269,7 +268,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
             }}
             onChange={this.handleInlineChange.bind(this, i)}>
             <Radio
-              id="inlineRadio1"
+              id={'inlineRadio_0_' + i}
               inline
               name={'inlineRadios' + i}
               value="table"
@@ -277,7 +276,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
               checked={q.renderAs === 'table'}
             />
             <Radio
-              id="inlineRadio2"
+              id={'inlineRadio_1_' + i}
               inline
               name={'inlineRadios' + i}
               value="timeline"
@@ -285,15 +284,15 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
               checked={q.renderAs === 'timeline'}
             />
             <Radio
-            id="inlineRadio3"
-            inline
-            name={'inlineRadios' + i}
-            value="bars"
-            label="Bars"
-            checked={q.renderAs === 'bars'}
+              id={'inlineRadio_2_' + i}
+              inline
+              name={'inlineRadios' + i}
+              value="bars"
+              label="Bars"
+              checked={q.renderAs === 'bars'}
             />
             <Radio
-              id="inlineRadio4"
+              id={'inlineRadio_3_' + i}
               inline
               name={'inlineRadios' + i}
               value="pie"

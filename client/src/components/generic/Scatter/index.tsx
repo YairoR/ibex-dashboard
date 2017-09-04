@@ -8,8 +8,7 @@ import { GenericComponent, IGenericProps, IGenericState } from '../GenericCompon
 import { ScatterChart, Scatter as ScatterLine, XAxis, YAxis, ZAxis, CartesianGrid } from 'recharts';
 import { Tooltip, Legend } from 'recharts';
 
-import colors from '../../colors';
-const { ThemeColors } = colors;
+import { ThemeColors } from '../../colors';
 
 interface IScatterProps extends IGenericProps {
   theme?: string[];

@@ -7,8 +7,7 @@ import ResponsiveContainer from '../../ResponsiveContainer';
 import { GenericComponent, IGenericProps, IGenericState } from '../GenericComponent';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-import colors from '../../colors';
-const { ThemeColors } = colors;
+import { ThemeColors } from '../../colors';
 
 interface IBarProps extends IGenericProps {
   props: {
@@ -55,7 +54,7 @@ export default class BarData extends GenericComponent<IBarProps, IBarState> {
 
   render() {
     let { values, bars, isTimeChart } = this.state;
-    let { id, title, subtitle, props, layout } = this.props;
+    let { id, title, subtitle, props, layout, theme } = this.props;
     let { barProps, showLegend, nameKey } = props;
 
     nameKey = isTimeChart == true ? 'time' : (nameKey || 'value');
@@ -73,6 +72,7 @@ export default class BarData extends GenericComponent<IBarProps, IBarState> {
       );
     }
 
+    const themeColors = theme || ThemeColors;
     var barElements = [];
     if (values && values.length && bars) {
       barElements = bars.map((bar, idx) => {
@@ -81,7 +81,7 @@ export default class BarData extends GenericComponent<IBarProps, IBarState> {
             key={idx} 
             stackId="1" 
             dataKey={bar.name || bar} 
-            fill={bar.color || ThemeColors[idx]} 
+            fill={bar.color || themeColors[idx]} 
             onClick={this.handleClick} 
           />
         );

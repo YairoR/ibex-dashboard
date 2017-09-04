@@ -7,8 +7,7 @@ import { RadialBarChart, RadialBar, PolarGrid, Tooltip, Legend } from 'recharts'
 import * as _ from 'lodash';
 import * as moment from 'moment';
 
-import colors from '../colors';
-var { ThemeColors } = colors;
+import { ThemeColors } from '../colors';
 
 interface IRadarProps extends IGenericProps {
   props: {

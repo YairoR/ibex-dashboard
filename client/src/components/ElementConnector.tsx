@@ -7,7 +7,12 @@ import { DataSourceConnector } from '../data-sources/DataSourceConnector';
 import VisibilityActions from '../actions/VisibilityActions';
 import VisibilityStore from '../stores/VisibilityStore';
 
+import { themes } from './colors';
+
 export default class ElementConnector {
+
+  private static _themeIndex: number = 0;
+  
   static loadLayoutFromDashboard(elementsContainer: IElementsContainer, dashboard: IDashboardConfig): ILayouts {
     
     var layouts = {};
@@ -97,6 +102,9 @@ export default class ElementConnector {
       dependencies = _.extend({}, dependencies, fromSource);
     }
 
+    theme = theme || themes[ElementConnector._themeIndex++];
+    if (ElementConnector._themeIndex >= themes.length) { ElementConnector._themeIndex = 0; }
+    
     return (
       <ReactElement 
         key={idx}
@@ -117,6 +125,7 @@ export default class ElementConnector {
     var elements = [];
     var elementId = {};
     var visibilityFlags = (VisibilityStore.getState() || {}).flags || {};
+    ElementConnector._themeIndex = 0;
 
     dashboard.elements.forEach((element, idx) => {
       var ReactElement = plugins[element.type];

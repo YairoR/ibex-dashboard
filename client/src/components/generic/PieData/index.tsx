@@ -7,8 +7,7 @@ import ResponsiveContainer from '../../ResponsiveContainer';
 import { GenericComponent, IGenericProps, IGenericState } from '../GenericComponent';
 import { PieChart, Pie, Sector, Cell, Legend } from 'recharts';
 
-import colors from '../../colors';
-const { ThemeColors } = colors;
+import { ThemeColors } from '../../colors';
 
 interface IPieProps extends IGenericProps {
   props: {

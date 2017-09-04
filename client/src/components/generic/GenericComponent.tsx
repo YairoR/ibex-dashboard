@@ -8,6 +8,7 @@ export interface IGenericProps {
   dependencies: { [key: string]: string };
   actions: { [key: string]: IAction };
   props: { [key: string]: Object };
+  theme?: string[];
   layout: {
     x: number;
     y: number;

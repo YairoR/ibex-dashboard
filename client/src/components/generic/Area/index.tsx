@@ -7,13 +7,11 @@ import { Tooltip, Legend, defs } from 'recharts';
 import Card from '../../Card';
 import ResponsiveContainer from '../../ResponsiveContainer';
 import Switch from 'react-md/lib/SelectionControls/Switch';
-import colors from '../../colors';
-var { ThemeColors } = colors;
+import { ThemeColors } from '../../colors';
 
 import '../generic.css';
 
 interface IAreaProps extends IGenericProps {
-  theme?: string[];
   showLegend?: boolean;
   isStacked?: boolean;
 }

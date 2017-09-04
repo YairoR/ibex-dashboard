@@ -8,8 +8,7 @@ import ResponsiveContainer from '../../ResponsiveContainer';
 
 import Button from 'react-md/lib/Buttons/Button';
 
-import colors from '../../colors';
-var { ThemeColors } = colors;
+import { ThemeColors } from '../../colors';
 
 interface ITimelineProps extends IGenericProps {
   theme?: string[];

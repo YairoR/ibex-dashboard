@@ -33,7 +33,7 @@ import Card from '../../../components/Card/Card';
 
 interface IQueryState {
   query: string; 
-  response: object;
+  response: any;
   responseExpanded: boolean;
   loadingData: boolean;
   renderAs: 'table' | 'timeline' | 'bars' | 'pie';
@@ -111,36 +111,93 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
     this.setState({ queries: this.setQueryState(index, 'responseExpanded', !expanded) });
   }
 
-  pinToDashboard(index: number) {
+  pinToDashboard(index: number, redirect: boolean) {
     let { dashboard, queries } = this.state;
-    let queryText = queries[index].query;
+    let { query, response, renderAs } = queries[index];
     let id = (new Date()).getTime().toString();
-    dashboard.dataSources.push(
-      {
-        id: 'e_' + id,
-        type: 'ApplicationInsights/Query',
-        dependencies: {
-          timespan: 'timespan',
-          queryTimespan: 'timespan:queryTimespan',
-          granularity: 'timespan:granularity',
-        },
-        params: { query: eval(`() => \`${queryText}\``) }, // tslint:disable-line
-        format: { type: 'timeline', args: { timeField: 'timestamp', lineField: 'channel', valueField: 'count' } }
-      }
-    );
+    
+    if (!response || !response.Tables || response.Tables.length < 1 || response.Tables[0].Columns.length < 1) { 
+      return; 
+    }
 
-    dashboard.elements.push(
-      {
-        id: 'timeline_' + id,
-        type: 'Timeline',
-        title: 'Message Rate',
-        subtitle: 'How many messages were sent per timeframe',
-        size: { w: 5, h: 8 },
-        source: 'e_' + id
-      }
-    );
+    const columns = response.Tables[0].Columns;
+
+    let dataSource: DataSource = {
+      id: 'ds_' + id,
+      type: 'ApplicationInsights/Query',
+      dependencies: {
+        timespan: 'timespan',
+        queryTimespan: 'timespan:queryTimespan',
+        granularity: 'timespan:granularity'
+      },
+      params: { query: eval(`() => \`${query}\``) }, // tslint:disable-line
+      format: null
+    };
+
+    let element: IElement = {
+      id: 'el_' + id,
+      type: null,
+      title: 'Message Rate',
+      subtitle: 'How many messages were sent per timeframe',
+      size: { w: 5, h: 8 },
+      source: dataSource.id
+    };
+
+    switch (renderAs) {
+      case 'timeline':
+
+        if (response.Tables[0].Columns.length < 2) { return; }
+
+        dataSource.format = { 
+          type: 'timeline', 
+          args: { 
+            timeField: response.Tables[0].Columns[0].ColumnName, 
+            valueField: response.Tables[0].Columns[1].ColumnName,
+            lineField: response.Tables[0].Columns.length > 2 ? response.Tables[0].Columns[2].ColumnName : undefined
+          }
+        };
+        element.type = 'Timeline';
+
+        break;
+
+      case 'bars':
+        dataSource.format = { 
+          type: 'bars', 
+          args: { 
+            barsField: response.Tables[0].Columns[0].ColumnName,
+            seriesField: response.Tables[0].Columns.length > 1 ? response.Tables[0].Columns[1].ColumnName : undefined,
+            valueField: response.Tables[0].Columns.length > 2 ? response.Tables[0].Columns[2].ColumnName : undefined
+          }
+        };
+        element.type = 'BarData';
+        break;
+
+      case 'pie':
+    
+        if (response.Tables[0].Columns.length < 2) { return; }
+      
+        dataSource.format = { 
+          type: 'pie',
+          args: {
+            label: response.Tables[0].Columns[0].ColumnName,
+            value: response.Tables[0].Columns[1].ColumnName, 
+          }
+         };
+         element.type = 'PieData';
+         break;
+
+      default:
+        return;
+    }
+
+    dashboard.dataSources.push(dataSource);
+    dashboard.elements.push(element);
 
     ConfigurationsActions.saveConfiguration(dashboard);
+
+    if (redirect) {
+      setTimeout(() => window.location.replace('/dashboard/bot_analytics_inst'), 1000);
+    }
   }
 
   submitQuery(index: number) {
@@ -155,6 +212,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
       queries[index].response = json;
       queries[index].loadingData = false;
 
+      // Entering a new, automatic new cell to the explorer
       if (queries.length === index + 1) {
         queries.push({
           query: 'customEvents | take 5',
@@ -208,6 +266,10 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
 
   hourFormat(time: string) {
     return moment(time).format('HH:mm');
+  }
+
+  dateFormat(time: string) {
+    return moment(time).format('MMM-DD');
   }
 
   handleInlineChange(index: number, value: string) {
@@ -307,7 +369,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
                         <LineChart width={730} height={250} 
                           data={formatForRender(q.response)} 
                           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                          <XAxis dataKey="time" tickFormatter={this.hourFormat} minTickGap={20} />
+                          <XAxis dataKey="time" tickFormatter={this.dateFormat} minTickGap={20} />
                           <YAxis/>
                           <CartesianGrid strokeDasharray="3 3" />
                           <Tooltip />
@@ -354,7 +416,8 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
                   }
                 </div>
                 <div style={styles.resultsOptions}>
-                  <Button raised label="Pin" onClick={this.pinToDashboard.bind(this, i)} style={{ width: 100 }} />
+                  <Button raised label="Pin" onClick={this.pinToDashboard.bind(this, i, false)} />
+                  <Button raised label="Pin &amp; Jump" onClick={this.pinToDashboard.bind(this, i, true)} />
                 </div>
               </div>
             )

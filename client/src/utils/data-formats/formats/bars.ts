@@ -76,7 +76,7 @@ export function bars(
   }
 
   let result = {};
-  let barValues: { [time: number] : object} = {};
+  let barValues: { [time: number]: object} = {};
   let isTimeChart = false;
 
   // Setting the field describing the bars
@@ -101,7 +101,7 @@ export function bars(
       barValues = _.sortBy(_.values(barValues), "value");
       
       barValues = _.map(barValues, row => {
-        row["time"] = (new Date(row["value"])).getTime()
+        row['time'] = (new Date(row["value"])).getTime()
         isTimeChart = true;
         
         return row;

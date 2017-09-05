@@ -12,11 +12,11 @@ import Card from '../../Card';
 
 const styles = {
   autoscroll: {
-    overflow: 'auto'
+    overflowY: 'auto'
   } as React.CSSProperties
 };
 
-const defaultPagination: number[] = [10, 50, 100];
+const defaultPagination: number[] = [5, 10, 50, 100];
 
 export type ColType = 'text' | 'time' | 'icon' | 'button' | 'ago' | 'number';
 

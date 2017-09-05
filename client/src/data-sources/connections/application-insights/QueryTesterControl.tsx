@@ -53,6 +53,7 @@ interface IQueryTesterProps {
 const styles = {
   results: {
     overflowY: 'scroll',
+    overflowX: 'auto',
     height: 'calc(100% - 200px)',
     width: 'calc(100% - 200px)',
     maxHeight: '300px',

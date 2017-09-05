@@ -67,6 +67,10 @@ export function timeline(
   let _timeline: { [time: number] : object} = {};
   let _lines = {};
 
+  if (!values) {
+   return; 
+  }
+
   timeline.forEach(row => {
     let timestamp = row[timeField];
     let lineFieldValue = lineField === undefined ? valueField : row[lineField];

@@ -59,7 +59,7 @@ export default class BarData extends GenericComponent<IBarProps, IBarState> {
     let { barProps, showLegend, nameKey } = props;
 
     nameKey = isTimeChart == true ? 'time' : (nameKey || 'value');
-    var format = isTimeChart == true ? this.hourFormat : {};
+    var format = isTimeChart == true ? this.hourFormat : null;
 
     if (!values) {
       return null;

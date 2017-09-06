@@ -110,11 +110,11 @@ export function bars(
 
     result[prefix + 'bars'] = _.keys(series);
     result[prefix + 'bar-values'] = barValues;
-    result["isTimeChart"] = isTimeChart;
+    result[prefix + 'isTimeChart'] = isTimeChart;
   } else {
     result[prefix + 'bars'] = [valueField];
     result[prefix + 'bar-values'] = values;
-    result["isTimeChart"] = isTimeChart;
+    result[prefix + 'isTimeChart'] = isTimeChart;
   }
 
   return result;

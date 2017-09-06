@@ -108,7 +108,7 @@ export function bars(
       });
     }
 
-    result[prefix + 'bars'] = _.keys(series);
+    result[prefix + 'bars'] = _.take(_.keys(series), 30);
     result[prefix + 'bar-values'] = barValues;
     result[prefix + 'isTimeChart'] = isTimeChart;
   } else {

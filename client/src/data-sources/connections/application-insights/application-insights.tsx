@@ -21,7 +21,7 @@ class AIConnectionEditor extends ConnectionEditor<IConnectionProps, any> {
     let { connection } = this.props;
     connection = connection || {};
 
-    let accessApiUri = 'https://api.aimon.applicationinsights.io/documentation/Authorization/API-key-and-App-ID';
+    let accessApiUri = 'https://api.applicationinsights.io/documentation/Authorization/API-key-and-App-ID';
 
     return (
       <Card className="md-grid hide-borders">

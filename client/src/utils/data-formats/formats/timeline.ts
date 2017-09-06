@@ -64,7 +64,7 @@ export function timeline(
   let values = state[args.data || 'values'];
   const timeline = values;
 
-  let _timeline: { [time: number] : object} = {};
+  let _timeline: { [time: number]: object} = {};
   let _lines = {};
 
   if (!values) {
@@ -108,7 +108,7 @@ export function timeline(
   let result = {};
   result[prefix + 'graphData'] = timelineValues;
   result[prefix + 'timeFormat'] = (timespan === '24 hours' ? 'hour' : 'date');
-  result[prefix + 'lines'] = lines;
+  result[prefix + 'lines'] = _.take(lines, 30);
   result[prefix + 'pieData'] = usage;
 
   return result;

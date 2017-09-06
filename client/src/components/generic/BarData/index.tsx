@@ -6,6 +6,7 @@ import Card from '../../Card';
 import ResponsiveContainer from '../../ResponsiveContainer';
 import { GenericComponent, IGenericProps, IGenericState } from '../GenericComponent';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import utils from '../../../utils';
 
 import { ThemeColors } from '../../colors';
 
@@ -98,7 +99,7 @@ export default class BarData extends GenericComponent<IBarProps, IBarState> {
             {...barProps}
           >
             <XAxis dataKey={nameKey || ''} tickFormatter={format} />
-            <YAxis />
+            <YAxis tickFormatter={utils.kmNumber} />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
             {barElements}

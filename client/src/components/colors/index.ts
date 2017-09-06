@@ -27,8 +27,8 @@ const themes = [
   mapByNumber(400, 8),
   mapByNumber(300, 10),
   mapByNumber(200, 12),
-  mapByNumber(100, 14)
-]
+  mapByNumber(900, 14)
+];
 
 const DangerColor = colors.red[500];
 const PersonColor = colors.teal[700];

@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import Card from '../../Card';
 import ResponsiveContainer from '../../ResponsiveContainer';
+import utils from '../../../utils';
 
 import Button from 'react-md/lib/Buttons/Button';
 
@@ -67,7 +68,7 @@ export default class Timeline extends GenericComponent<ITimelineProps, ITimeline
         <ResponsiveContainer layout={layout}>
           <LineChart data={values} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} {...lineProps}>
             <XAxis dataKey="time" tickFormatter={format} minTickGap={20} />
-            <YAxis type="number" domain={['dataMin', 'dataMax']} />
+            <YAxis type="number" tickFormatter={utils.kmNumber} domain={['dataMin', 'dataMax']} />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
             <Legend />

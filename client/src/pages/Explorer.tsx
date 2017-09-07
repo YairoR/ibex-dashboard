@@ -1,5 +1,6 @@
 import * as React from 'react';
 import TextField from 'react-md/lib/TextFields';
+import * as _ from 'lodash';
 
 import QueryTesterControl from '../data-sources/connections/application-insights/QueryTesterControl';
 
@@ -18,18 +19,19 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
     this.onApiKeyChange = this.onApiKeyChange.bind(this);
     this.onAppIdChange = this.onAppIdChange.bind(this);
 
-    this.state = {
-      apiKey: '',
-      appId: ''
-    };
+    let { apiKey, appId } = JSON.parse(localStorage.getItem('ExplorerConnection') || '{ }');
+    
+    this.state = { apiKey, appId };
   }
 
   onApiKeyChange(value: string) {
     this.setState({ apiKey: value });
+    localStorage.setItem('ExplorerConnection', JSON.stringify(this.state));
   }
 
   onAppIdChange(value: string) {
     this.setState({ appId: value });
+    localStorage.setItem('ExplorerConnection', JSON.stringify(this.state));
   }
 
   render() {

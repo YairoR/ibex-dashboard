@@ -69,22 +69,10 @@ const styles = {
 
 export default class QueryTesterControl extends React.Component<IQueryTesterProps, IQueryTesterState> {
 
-  state: IQueryTesterState = {
-    queries: [
-      {
-        query: 'customEvents | limit 200 | summarize count() by bin(timestamp, 10m)',
-        response: null,
-        loadingData: false,
-        responseExpanded: true,
-        renderAs: 'table'
-      }
-    ],
-    dashboard: null
-  };
-
   constructor(props: any) {
     super(props);
 
+    this.queriesUpdated = this.queriesUpdated.bind(this);
     this.getQueryState = this.getQueryState.bind(this);
     this.setQueryState = this.setQueryState.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
@@ -93,7 +81,27 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
     this.configurationLoaded = this.configurationLoaded.bind(this);
     this.handleInlineChange = this.handleInlineChange.bind(this);
 
+    let queries: IQueryState[] = JSON.parse(localStorage.getItem('ExplorerQueries') || '[ ]');
+    if (!queries || queries.length === 0) {
+      queries.push({
+        query: 'customEvents | limit 200 | summarize count() by bin(timestamp, 10m)',
+        response: null,
+        loadingData: false,
+        responseExpanded: true,
+        renderAs: 'table'
+      });
+    }
+    
+    this.state = {
+      queries,
+      dashboard: null
+    } as IQueryTesterState;
+
     ConfigurationsActions.loadDashboard('bot_analytics_inst');
+  }
+
+  queriesUpdated() {
+    localStorage.setItem('ExplorerQueries', JSON.stringify(this.state.queries));
   }
 
   getQueryState(index: number, property: string): any {
@@ -282,6 +290,8 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
 
   render() {
     const { queries } = this.state;
+
+    this.queriesUpdated();
 
     let mapResult = (response) => {
       const result = response && 

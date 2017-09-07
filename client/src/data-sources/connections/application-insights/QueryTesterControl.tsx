@@ -67,6 +67,14 @@ const styles = {
   } as React.CSSProperties
 };
 
+const INITIAL_QUERY: IQueryState = {
+  query: 'customEvents | limit 200 | summarize count() by bin(timestamp, 10m)',
+  response: null,
+  loadingData: false,
+  responseExpanded: true,
+  renderAs: 'table'
+};
+
 export default class QueryTesterControl extends React.Component<IQueryTesterProps, IQueryTesterState> {
 
   constructor(props: any) {
@@ -80,16 +88,11 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
     this.toggleResponse = this.toggleResponse.bind(this);
     this.configurationLoaded = this.configurationLoaded.bind(this);
     this.handleInlineChange = this.handleInlineChange.bind(this);
+    this.cleanQueries = this.cleanQueries.bind(this);
 
     let queries: IQueryState[] = JSON.parse(localStorage.getItem('ExplorerQueries') || '[ ]');
     if (!queries || queries.length === 0) {
-      queries.push({
-        query: 'customEvents | limit 200 | summarize count() by bin(timestamp, 10m)',
-        response: null,
-        loadingData: false,
-        responseExpanded: true,
-        renderAs: 'table'
-      });
+      queries.push(INITIAL_QUERY);
     }
     
     this.state = {
@@ -102,6 +105,10 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
 
   queriesUpdated() {
     localStorage.setItem('ExplorerQueries', JSON.stringify(this.state.queries));
+  }
+
+  cleanQueries() {
+    this.setState({ queries: [ INITIAL_QUERY ] });
   }
 
   getQueryState(index: number, property: string): any {
@@ -447,6 +454,7 @@ export default class QueryTesterControl extends React.Component<IQueryTesterProp
 
     return (
       <div style={{ width: '100%' }}>
+        <Button raised label="Clean Notebook" onClick={this.cleanQueries} style={{ float: 'right' }} />        
         {queryParts}
       </div>
     );

@@ -26,16 +26,17 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
 
   onApiKeyChange(value: string) {
     this.setState({ apiKey: value });
-    localStorage.setItem('ExplorerConnection', JSON.stringify(this.state));
   }
 
   onAppIdChange(value: string) {
     this.setState({ appId: value });
-    localStorage.setItem('ExplorerConnection', JSON.stringify(this.state));
   }
 
   render() {
 
+    // Saving state for future renderings from fresh
+    localStorage.setItem('ExplorerConnection', JSON.stringify(this.state));
+    
     return (
       <div style={{ width: '100%' }}>
         <div className="md-grid">

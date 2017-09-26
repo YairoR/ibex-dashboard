@@ -1,6 +1,7 @@
 import alt, { AbstractStoreModel } from '../../alt';
 import 'expose-loader?AuthenticationContext!adal-angular';
 import { AdalConfig } from './AdalConfig';
+import AccountActions from '../../actions/AccountActions';
 
 let createAuthContextFn: adal.AuthenticationContextStatic = AuthenticationContext; 
  
@@ -22,9 +23,16 @@ export class ActiveDirectoryAuthenticator {
 
   public handleCallback() {
     this.context.handleWindowCallback();
+
+    // In case this callback is after the user authenticated, save the login information in the store
+    if (this.isAuthenticated)
+    {
+      AccountActions.setAuthenticationDetails(this.userInfo.profile.given_name,
+                                              this.userInfo.profile.given_name);
+    }
   }
 
-  public get userInfo() {
+  public get userInfo() {    
     return this.context.getCachedUser();
   }
 

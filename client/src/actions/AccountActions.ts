@@ -6,6 +6,7 @@ import utils from '../utils';
 interface IAccountActions {
   failure(error: any): any;
   updateAccount(): any;
+  setAuthenticationDetails(userFirstName: string, userLastName: string): any;
 }
 
 class AccountActions extends AbstractActions implements IAccountActions {
@@ -15,7 +16,6 @@ class AccountActions extends AbstractActions implements IAccountActions {
   }
 
   updateAccount() {
-
     return (dispatcher: (account: IDictionary) => void) => {
 
       request('/auth/account', { json: true }, (error: any, result: any) => {
@@ -27,6 +27,11 @@ class AccountActions extends AbstractActions implements IAccountActions {
       );
 
     };
+  }
+
+  setAuthenticationDetails(userFirstName: string, userLastName: string)
+  {
+    return { userFirstName: userFirstName, userLastName: userLastName };
   }
 
   failure(error: any) {

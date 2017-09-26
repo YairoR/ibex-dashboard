@@ -11,6 +11,7 @@ import Chip from 'react-md/lib/Chips';
 import Menu from 'react-md/lib/Menus/Menu';
 import MenuButton from 'react-md/lib/Menus/MenuButton';
 import Button from 'react-md/lib/Buttons';
+import { ActiveDirectoryAuthenticator } from '../../utils/adal/ActiveDirectoryAuthenticator';
 
 import AccountStore from '../../stores/AccountStore';
 import AccountActions from '../../actions/AccountActions';
@@ -36,7 +37,7 @@ export default class Navbar extends React.Component<any, any> {
       this.setState(state);
     });
     AccountActions.updateAccount();
-
+    
     ConfigurationsStore.listen((state) => {
       this.setState({
         dashboards: state.dashboards
@@ -181,6 +182,10 @@ export default class Navbar extends React.Component<any, any> {
           leftIcon={<FontIcon>lock</FontIcon>}
         />
       </MenuButton>
+    ),
+    (
+      <Avatar>{this.state.userFirstName ? this.state.userFirstName.charAt(0).toUpperCase() :
+                                          "?"}</Avatar>
     )];
 
     if (noTemplates && !dashboards && window.location.pathname !== '/setup') {

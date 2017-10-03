@@ -1,6 +1,4 @@
 export class AdalConfig { 
-  constructor() { 
-  } 
 
   public get getAdalConfig(): any { 
     return { 

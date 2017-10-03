@@ -1,4 +1,4 @@
-/// <reference path='../../../client/@types/types.d.ts'/>
+/// <reference path='../../../../client/@types/types.d.ts'/>
 import * as _ from 'lodash';
 
 /* tslint:disable:indent quotemark max-line-length */
@@ -302,7 +302,7 @@ export const config: IDashboardConfig = /*return*/ {
           },
           calculated: (state, dependencies) => {
             const { values } = state;
-            if (!values) { return; }
+            if (!values) { return {}; }
             const chat = values.map(msg => (
               _.extend(msg, {
                 icon: isNaN(parseInt(msg.sentiment, 10)) ? '' :

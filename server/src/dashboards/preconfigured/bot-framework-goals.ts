@@ -1,4 +1,4 @@
-/// <reference path='../../../client/@types/types.d.ts'/>
+/// <reference path='../../../../client/@types/types.d.ts'/>
 import * as _ from 'lodash';
 
 /* tslint:disable:indent quotemark max-line-length */
@@ -305,7 +305,7 @@ export const config: IDashboardConfig = /*return*/ {
           calculated: (state, dependencies) => {
             let { values } = state;
 
-            if (!values) { return; }
+            if (!values) { return {}; }
 
             _.forEach(values, (msg, index) => {
               msg.message = msg.message;

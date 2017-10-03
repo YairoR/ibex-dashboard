@@ -1,4 +1,4 @@
-/// <reference path='../../../client/@types/types.d.ts'/>
+/// <reference path='../../../../client/@types/types.d.ts'/>
 import * as _ from 'lodash';
 
 // The following line is important to keep in that format so it can be rendered into the page
@@ -38,38 +38,6 @@ export const config: IDashboardConfig = /*return*/ {
         samples: {
           initialValue: 0
         }
-      }
-    },
-    {
-      id: 'azure',
-      type: 'Azure',
-      dependencies: { someValue: 'samples:initialValue' },
-      params: { type: 'resources' },
-      calculated: (state, dependencies) => {
-
-        let resources = state.values || [];
-        let resourceTypes = _.toPairs(
-          _.groupBy(state.values, 'kind')).map(val => ({ name: val[0], value: val[1].length})
-        );
-
-        return  { resources, resourceTypes };
-      }
-    },
-    {
-      id: 'azureLocations',
-      type: 'Azure',
-      dependencies: { someValue: 'samples:initialValue' },
-      params: { type: 'locations' },
-      calculated: (state, dependencies) => {
-
-        let locations = state.values || [];
-        let mapData = locations.map(loc => ({
-          lat: loc.latitude,
-          lng: loc.longitude,
-          tooltip: loc.displayName + ': ' + loc.name
-        }));
-
-        return  { locations: mapData };
       }
     }
   ],

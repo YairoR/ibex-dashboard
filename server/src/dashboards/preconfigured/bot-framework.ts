@@ -1,33 +1,37 @@
-/// <reference path='../../../client/@types/types.d.ts'/>
+/// <reference path='../../../../client/@types/types.d.ts'/>
 import * as _ from 'lodash';
 
 // The following line is important to keep in that format so it can be rendered into the page
 export const config: IDashboardConfig = /*return*/ {
-  id: 'bot_analytics_inst',
-  name: 'Bot Analytics Instrumented Dashboard',
+  id: 'bot_analytics_dashboard',
+  name: 'Bot Analytics Basic Dashboard',
   icon: 'dashboard',
-  url: 'bot_analytics_inst',
+  url: 'bot_analytics_dashboard',
   description: 'Microsoft Bot Framework based analytics',
-  preview: '/images/bot-instrumented.png',
+  preview: '/images/bot-ai-base.png',
   category: 'Bots',
-  featured: true,
   html: `
     <div>
-      This dashboard is built to view events sent by Microsoft Bot Framework based bot.
+      This dashboard is built to view the events being sent by the Bot Framework sent for a registered bot.
       <br/>
       <br/>
-      <h2>Getting the data to show</h2>
+      <h2>Getting Additional Telemetry</h2>
       <p>
-        To see all the capabilities of this dashboard, it is recommended to integrate you bot with one of the following:
+        Parts of this dashboard will not be functional unless you add additional telemetry 
+        with one of the following plugins:
         <br/>
         <a href="https://github.com/CatalystCode/botbuilder-instrumentation" target="_blank">
           Node.js Telemetry Plugin
         </a>
         <br/>
-        <a href="https://github.com/CatalystCode/bot-sample-telemetry" target="_blank">C# Telemetry Plugin</a><br/>
+        <a href="https://github.com/CatalystCode/bot-sample-telemetry" target="_blank">C# Telemetry Plugin</a>
+        <br/>
         This will enable the bot to send additional telemetry information to Application Insights.
+        <br/>
+        <br/>
+        If you are connecting your bot to one of these instrumentation modules, 
+        <b>Bot Analytics Instrumented Dashboard</b> will give you a better view of your data.
       </p>
-      <br/>
       <h2>Additional Learnings</h2>
       <p>
         This dashboard uses 
@@ -109,7 +113,7 @@ export const config: IDashboardConfig = /*return*/ {
         queries: {
           timeline: {
             query: ({ granularity }) => `
-								where name == 'MBFEvent.UserMessage' 
+								where name == 'Activity' 
                 | summarize count=count() by bin(timestamp, ${granularity}), 
                   name, channel=tostring(customDimensions.channel) 
 								| order by timestamp asc `,
@@ -118,8 +122,8 @@ export const config: IDashboardConfig = /*return*/ {
           },
           'users-timeline': {
             query: ({ granularity }) => `
-                where name == 'MBFEvent.UserMessage' 
-                | summarize count=dcount(tostring(customDimensions.userId)) by bin(timestamp, ${granularity}), 
+                where name == 'Activity' 
+                | summarize count=dcount(tostring(customDimensions.from)) by bin(timestamp, ${granularity}), 
                   name, channel=tostring(customDimensions.channel) 
                 | order by timestamp asc`,
             filters: [{ dependency: 'selectedChannels', queryProperty: 'customDimensions.channel' }],
@@ -127,20 +131,17 @@ export const config: IDashboardConfig = /*return*/ {
           },
           intents: {
             query: () => `
-              extend cslen=customDimensions.callstack_length, value=tostring(customDimensions.intent) 
-              | where name=='MBFEvent.Intent' and (cslen == 0 or strlen(cslen) == 0) and strlen(value) > 0 
-              | summarize count=count() by value`,
+            extend cslen=customDimensions.callstack_length, value=tostring(customDimensions.intent) 
+            | where name=='MBFEvent.Intent' and (cslen == 0 or strlen(cslen) == 0) and strlen(value) > 0 
+            | summarize count=count() by value`,
             filters: [{ dependency: 'selectedIntents', queryProperty: 'customDimensions.intent' }],
             format: 'bars'
           },
           conversions: {
             query: () => `
-              extend successful=(customDimensions.successful == 'true') 
-              | summarize count_start=countif(name == 'MBFEvent.StartTransaction'), 
-                count_end=countif(name == 'MBFEvent.EndTransaction' and successful) by name, successful 
-              | where name == 'MBFEvent.StartTransaction' or (name == 'MBFEvent.EndTransaction' and successful) 
-              | extend count_start=toreal(count_start), count_end=toreal(count_end) 
-              | summarize count=sum(count_start) * 100 / sum(count_end)`,
+            extend successful=tostring(customDimensions.successful == 'true') 
+            | where name in ('MBFEvent.StartTransaction', 'MBFEvent.EndTransaction') 
+            | summarize event_count=count() by name, successful`,
             filters: [{ dependency: 'selectedChannels', queryProperty: 'customDimensions.channel' }],
             format: {
               type: 'scorecard',
@@ -152,17 +153,17 @@ export const config: IDashboardConfig = /*return*/ {
           },
           mapActivity: {
             query: () => `
-              where name=='MBFEvent.UserMessage' 
-              | extend location=strcat(client_City, ', ', client_CountryOrRegion) 
-              | summarize location_count=count() by location 
-              | extend popup=strcat('<b>', location, '</b><br />', location_count, ' messages') `,
+            where name=='MBFEvent.UserMessage' 
+            | extend location=strcat(client_City, ', ', client_CountryOrRegion) 
+            | summarize location_count=count() by location 
+            | extend popup=strcat('<b>', location, '</b><br />', location_count, ' messages') `,
             filters: [{ dependency: 'selectedChannels', queryProperty: 'customDimensions.channel' }]
           },
           sentiments: {
             query: () => `
-              where name startswith 'MBFEvent.Sentiment' 
-              | extend score=customDimensions.score
-              | summarize count=100 * avg(todouble(score))`,
+            where name startswith 'MBFEvent.Sentiment'  
+            | extend score=customDimensions.score 
+            | summarize sentiment=avg(todouble(score))`,
             format: {
               type: 'scorecard',
               args: {
@@ -205,8 +206,8 @@ export const config: IDashboardConfig = /*return*/ {
       params: {
         query: () => `
           customEvents 
-          | where name=='MBFEvent.UserMessage' 
-          | extend uniqueUser=tostring(customDimensions.userId) 
+          | where name=='Activity' 
+          | extend uniqueUser=tostring(customDimensions.from)
           | summarize oldestVisit=min(timestamp), lastVisit=max(timestamp) by uniqueUser 
           | summarize
             totalUnique = dcount(uniqueUser),
@@ -240,7 +241,7 @@ export const config: IDashboardConfig = /*return*/ {
       title: 'Channels',
       subtitle: 'Select channels',
       source: 'filters:channels',
-      actions: { onChange: 'filters:updateSelectedValues:channels-values-selected' },
+      actions: { onChange: 'filters:updateSelectedValues:channels-selected' },
       first: true
     },
     {
@@ -248,7 +249,7 @@ export const config: IDashboardConfig = /*return*/ {
       title: 'Intents',
       subtitle: 'Select intents',
       source: 'filters:intents',
-      actions: { onChange: 'filters:updateSelectedValues:intents-values-selected' },
+      actions: { onChange: 'filters:updateSelectedValues:intents-selected' },
       first: true
     }
   ],
@@ -724,7 +725,7 @@ export const config: IDashboardConfig = /*return*/ {
           calculated: (state, dependencies) => {
             let { values } = state;
 
-            if (!values) { return; }
+            if (!values) { return {}; }
 
             _.forEach(values, (msg, index) => {
               msg.message = msg.message;

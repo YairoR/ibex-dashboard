@@ -1,6 +1,8 @@
 /// <reference path="./constant.d.ts"/>
 /// <reference path="./ai.d.ts"/>
 /// <reference path="./sample.d.ts"/>
+/// <reference path="./cosmosdb.d.ts"/>
+/// <reference path="./botframework.d.ts"/>
 
 type IDict<T> = { [id: string]: T };
 type IDictionary = IDict<any>;

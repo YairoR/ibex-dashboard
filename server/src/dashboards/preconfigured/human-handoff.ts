@@ -1,4 +1,4 @@
-/// <reference path="../../../client/@types/types.d.ts"/>
+/// <reference path="../../../../client/@types/types.d.ts"/>
 import * as _ from 'lodash';
 
 /* tslint:disable:indent quotemark max-line-length */

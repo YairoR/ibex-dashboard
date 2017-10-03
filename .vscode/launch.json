@@ -23,7 +23,7 @@
       "type": "node",
       "request": "attach",
       "name": "Attach to Process",
-      "address": "localhost",
+      //"address": "localhost",
       "port": 5858,
       "outFiles": []
     }

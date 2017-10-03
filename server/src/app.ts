@@ -8,6 +8,7 @@ import graphQLRouter from './routes/graphql';
 import cosmosDBRouter from './routes/cosmos-db';
 import azureRouter from './routes/azure';
 import dashboardRouter from './routes/dashboardsRouter';
+import authRouter from './routes/authRouter';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -32,15 +33,17 @@ class App {
     // this.express.use('/cosmosdb', cosmosDBRouter.router);
     // this.express.use('/azure', azureRouter.router);
     // this.express.use('/graphql', graphQLRouter.router);
-    console.log(dashboardRouter)
-    this.express.use('/dashboards', dashboardRouter);
+    this.express.use(authRouter);
+    this.express.use('/api/dashboards', dashboardRouter);
     
     // this.express.use('/data/kusto', graphQLRouter.router);
     // this.express.use('/data/cosmosdb', graphQLRouter.router);
 
+    this.express.use(express.static(path.resolve(__dirname, '..', '..', '..', 'build')));
+
     // Always return the main index.html, so react-router render the route in the client
     this.express.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'));
+      res.sendFile(path.resolve(__dirname, '..', '..', '..', 'build', 'index.html'));
     });
 	}
 }

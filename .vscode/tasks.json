@@ -1,9 +1,10 @@
 {
+  "suppressTaskName": ,
   // version of this thing
   "version": "0.1.0",
 
   // The command is gulp.
-  "command": "tsc .\\server",
+  "command": "tsc ./server",
 
   // this is going to be a shell command.
   "isShellCommand": true,

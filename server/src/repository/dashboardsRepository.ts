@@ -13,18 +13,23 @@ export default class DashboardsRepository {
     //                                   this._config.connectionPolicy);	
 	}
 
-  public GetDashboards() : any
-  {
-    var collectionUrl = 'dbs/Ibex/colls/Dashboards';
-    
-    this._client.queryDocuments(collectionUrl, "select * from dashboards")
-                .toArray((error: QueryError, resource: RetrievedDocument[], responseHeaders: any) => {
-                  if (error) {
-                    throw "Failed to query DocDB " + error.body;
-                  }
+  public GetDashboards() : Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      var collectionUrl = 'dbs/Ibex/colls/Dashboards';
+      
+      this._client.queryDocuments(collectionUrl, "select * from dashboards")
+                  .toArray((error: QueryError, resource: RetrievedDocument[], responseHeaders: any) => {
+                    if (error) {
+                      reject("Failed to query DocDB " + error.body);
+                    }
 
-                  return resource;
-                  }
-                );
+                    resolve(resource);
+                    }
+                  );
+    });
+  }
+
+  public GetDashboard(string id) : Promise<any> {
+
   }
 }

@@ -1,0 +1,35 @@
+// CSS changes for the on-off button for showing the results
+.md-fake-btn.md-pointer--hover.md-switch-thumb.md-switch-thumb--on {
+  background: #E0E0E0;
+}
+
+.md-switch-track.md-pointer--hover.md-switch-track--on {
+  background: #6AB7C7;
+}
+
+//
+.md-selection-control-label.md-text.md-pointer--hover {
+  font-size: 19px;
+}
+
+// CSS changes for the 'change cluster' page
+
+// CSS Title properties
+.md-title.md-title--dialog {
+  text-align: center;
+  font-size: 35px;
+}
+
+.md-floating-label.md-floating-label--floating {
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.md-text-field-container.md-full-width.md-text-field-container--disabled.md-text-field-container--input {
+  display: inline-block;
+}
+
+.md-text-field.md-text--disabled.md-full-width.md-text-field--floating-margin {
+  padding: 10px 0 0 0;
+  font-size: 21px;
+}

@@ -1,16 +1,14 @@
 import * as React from 'react';
 
-import IEditorOptions from 'react-monaco-editor';
-import IEditorMinimapOptions from 'react-monaco-editor';
+import QueryExplorerActions from '../../actions/QueryExplorerActions';
 
-import Button from 'react-md/lib/Buttons/Button';
 import MonacoEditor from 'react-monaco-editor';
 
 import './style.css';
 
 interface IQueryEditorProps {
+  id: number;
   onChange?(val: string) : void;
-  onRunButtonPressed(query: string) : void;
 }
 
 interface IQueryEditorState {
@@ -42,15 +40,12 @@ export default class QueryEditor extends React.Component<IQueryEditorProps, IQue
     } 
 
     this.setState({ query: newValue });
+    QueryExplorerActions.updateQuery(newValue, this.props.id);
   }
 
   onRunButtonPressed() {
     // Get the current value (query) from the monaco editor
     var query = this.editor.getModel().getValue();
-
-    if (this.props.onRunButtonPressed) {
-      this.props.onRunButtonPressed(query);
-    }
   }
 
   getMonacoEditorSettings() : monaco.editor.IEditorOptions {
@@ -102,10 +97,6 @@ export default class QueryEditor extends React.Component<IQueryEditorProps, IQue
             onChange={this.queryChanged}
             options={this.getMonacoEditorSettings()}
           />
-        </div>
-        <div>
-          <Button primary raised label="Go" style={{ width: 100 }} 
-                  onClick={this.onRunButtonPressed.bind(this)} />
         </div>
       </div>
     );

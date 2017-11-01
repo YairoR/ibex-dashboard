@@ -1,52 +1,53 @@
 import * as React from 'react';
+
 import QueryEditor from './QueryEditor';
 import DataVisualization from './DataVisualization';
 import KustoApi from '../../data-sources/plugins/Kusto';
 import { KustoClusterInfo } from './Contracts/KustoClusterInfo';
+import QueryExplorerActions from '../../actions/QueryExplorerActions';
+import QueryExplorerStore, { IQueryExplorerState, ICellState } from '../../stores/QueryExplorerStore';
+
+import Button from 'react-md/lib/Buttons/Button';
 
 interface ISingleQueryExploreProps {
-  id: string;
+  id: number;
   kustoClusterInfo: KustoClusterInfo; // TODO - don't think it should be nullable
 }
 
 interface ISingleQueryExploreState {
-  renderAs?: 'loading' | 'table' | 'timeline' | 'bars' | 'pie';
-  queryResponse?: string;
+  cellState: ICellState;
 }
 
 export default class SingleQueryExplore extends React.Component<ISingleQueryExploreProps,
                                                                 ISingleQueryExploreState> {
   constructor(props: any) {
     super(props);
-    
-    this.executeQuery = this.executeQuery.bind(this);
-    
+  
+    this.onQueryExplorerStoreChange = this.onQueryExplorerStoreChange.bind(this);
+
+    var state = QueryExplorerStore.getState();
+
     this.state = {
-      renderAs: null,
-      queryResponse: null
+      cellState: state.cells[this.props.id]
     };
   }
-  
-  executeQuery(query: string) {
-    let kustoApi = new KustoApi();
 
-    // Force component to update in order to show the loading circle
-    this.setState({ renderAs: 'loading' });
-
-    kustoApi.QueryData(this.props.kustoClusterInfo.ClusterName,
-                       this.props.kustoClusterInfo.DatabaseName,
-                       query, (err, json) => {
-      if (err) {
-        console.log('Error reading data from kusto: ' + err);
-        return;
-      }
-
-      this.setState({ renderAs: 'table', queryResponse: json });
-    });
+  componentDidMount() {   
+    QueryExplorerStore.listen(this.onQueryExplorerStoreChange);
   }
 
   onRenderTypeChanged(newRenderType: any) {
-    this.setState({ renderAs: newRenderType });
+    // this.setState({ renderAs: newRenderType });
+  }
+
+  onRunButtonPress() {
+    QueryExplorerActions.executeQuery(this.props.id, this.props.kustoClusterInfo.ClusterName,
+                                      this.props.kustoClusterInfo.DatabaseName,
+                                      this.state.cellState.query);
+  }
+
+  onQueryExplorerStoreChange(state: IQueryExplorerState) {
+    this.setState({ cellState: state.cells[this.props.id] })
   }
 
   render() {
@@ -67,11 +68,12 @@ export default class SingleQueryExplore extends React.Component<ISingleQueryExpl
                     borderColor: '#E3E3E3',
                     marginBottom: '30px'
       }}>
-          <QueryEditor onRunButtonPressed={(query) => this.executeQuery(query)} />
-
+          <QueryEditor id={this.props.id} />
+          <Button primary raised label="Go" style={{ width: 100 }} 
+                  onClick={this.onRunButtonPress.bind(this)} />
           <DataVisualization id={this.props.id} 
-                             renderAs={this.state.renderAs}
-                             queryResponse={this.state.queryResponse}
+                             renderAs={this.state.cellState.renderAs}
+                             queryResponse={this.state.cellState.response}
                              onRenderTypeChanged={this.onRenderTypeChanged.bind(this)} />
         </div>
       </div>

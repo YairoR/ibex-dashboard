@@ -3,6 +3,8 @@ import * as React from 'react';
 import SingleQueryExplore from './SingleQueryExplore';
 import ClusterChangeForm from './ClusterChangeForm';
 import { KustoClusterInfo } from './Contracts/KustoClusterInfo';
+import QueryExplorerActions from '../../actions/QueryExplorerActions';
+import QueryExplorerStore, { IQueryExplorerState, ICellState } from '../../stores/QueryExplorerStore';
 
 import Divider from 'react-md/lib/Dividers/Divider';
 import FontIcon from 'react-md/lib/FontIcons/FontIcon';
@@ -19,7 +21,7 @@ interface IExplorerProps {
 interface IExplorerState {
   showChangeClusterForm: boolean;
   currentKustoClusterInUse: KustoClusterInfo;
-  activeSingleExplorers: number[];
+  activeSingleExplorers: ICellState[];
 }
 
 export default class Explorer extends React.Component<IExplorerProps, IExplorerState> {
@@ -30,6 +32,7 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
     this.showChangeClusterForm = this.showChangeClusterForm.bind(this);
     this.hideChangeClusterForm = this.hideChangeClusterForm.bind(this);
     this.addSingleQueryExplorer = this.addSingleQueryExplorer.bind(this);
+    this.onQueryExplorerStoreChange = this.onQueryExplorerStoreChange.bind(this);
 
     this.state = {
       showChangeClusterForm : false,
@@ -37,8 +40,15 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
         ClusterName: 'laint',
         DatabaseName: '_LongTail01'
       },
-      activeSingleExplorers: [ 0 ]
+      activeSingleExplorers: []
     };
+  }
+
+  componentDidMount() {
+    QueryExplorerStore.listen(this.onQueryExplorerStoreChange);
+
+    // Add default cell
+    this.addSingleQueryExplorer();
   }
 
   showChangeClusterForm() {
@@ -51,14 +61,18 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
 
   addSingleQueryExplorer() {
     let currentActiveSingleExplorers = this.state.activeSingleExplorers;
-    currentActiveSingleExplorers.push(currentActiveSingleExplorers.length + 1);
 
-    this.setState({ activeSingleExplorers: currentActiveSingleExplorers });
+    QueryExplorerActions.addCell(currentActiveSingleExplorers.length);
+  }
+
+  onQueryExplorerStoreChange(state: IQueryExplorerState) {
+    this.setState({ activeSingleExplorers: state.cells })
   }
 
   render() {
-    let queriesView = this.state.activeSingleExplorers.map((v, i) => (
-      <SingleQueryExplore id={v.toString()} kustoClusterInfo={this.state.currentKustoClusterInUse} />
+    let queriesView = this.state.activeSingleExplorers.map((cell, index) => (
+      <SingleQueryExplore id={cell.id}
+                          kustoClusterInfo={this.state.currentKustoClusterInUse} />
     ));
 
     return (

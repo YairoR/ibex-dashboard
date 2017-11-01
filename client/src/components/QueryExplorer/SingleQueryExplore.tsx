@@ -45,6 +45,10 @@ export default class SingleQueryExplore extends React.Component<ISingleQueryExpl
     });
   }
 
+  onRenderTypeChanged(newRenderType: any) {
+    this.setState({ renderAs: newRenderType });
+  }
+
   render() {
     const displayOptions = { 
       'table': 'view_list', 
@@ -67,7 +71,8 @@ export default class SingleQueryExplore extends React.Component<ISingleQueryExpl
 
           <DataVisualization id={this.props.id} 
                              renderAs={this.state.renderAs}
-                             queryResponse={this.state.queryResponse} />
+                             queryResponse={this.state.queryResponse}
+                             onRenderTypeChanged={this.onRenderTypeChanged.bind(this)} />
         </div>
       </div>
     );

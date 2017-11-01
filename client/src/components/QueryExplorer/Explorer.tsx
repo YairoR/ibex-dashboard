@@ -80,9 +80,9 @@ export default class Explorer extends React.Component<IExplorerProps, IExplorerS
             </div>
           </div>
           <ClusterChangeForm visible={this.state.showChangeClusterForm}
-                               onHide={this.hideChangeClusterForm}
-                               activeClusterName='laint'
-                               activeDatabaseName='_LongTail01'/>
+                             onHide={this.hideChangeClusterForm}
+                             activeClusterName='laint'
+                             activeDatabaseName='_LongTail01'/>
           <Divider />
         </div>
         <div style={{ padding: '30px' }}>

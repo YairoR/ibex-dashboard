@@ -1,14 +1,9 @@
 import * as React from 'react';
 
-import CircularProgress from 'react-md/lib/Progress/CircularProgress';
+import TimelineVisual from './DataVisualizations/TimelineVisual';
 
-import DataTable from 'react-md/lib/DataTables/DataTable';
-import TableHeader from 'react-md/lib/DataTables/TableHeader';
-import TableBody from 'react-md/lib/DataTables/TableBody';
-import TableRow from 'react-md/lib/DataTables/TableRow';
-import TableColumn from 'react-md/lib/DataTables/TableColumn';
+import CircularProgress from 'react-md/lib/Progress/CircularProgress';
 import SelectionControl from 'react-md/lib/SelectionControls/SelectionControl';
-import Collapse from 'react-md/lib/Helpers/Collapse';
 
 interface IDataVisualizationState {
   showResult: boolean;
@@ -16,8 +11,9 @@ interface IDataVisualizationState {
 
 interface IDataVisualizationProps {
   id: string;
-  renderAs?: 'loading' | 'table' | 'timeline' | 'bars' | 'pie';
   queryResponse?: string;
+  renderAs?: 'loading' | 'table' | 'timeline' | 'bars' | 'pie';
+  onRenderTypeChanged: (newRenderType: string) => void;
 }
 
 export default class DataVisualization extends React.Component<IDataVisualizationProps,
@@ -36,21 +32,11 @@ export default class DataVisualization extends React.Component<IDataVisualizatio
     this.setState({ showResult: checked });
   }
 
+  onRenderChanged(value: string) {
+    this.props.onRenderTypeChanged(value as any);
+  }
+
   render() {
-    let mapResult = (response) => {
-      const result = response && 
-                    (response as any).Tables && 
-                    (response as any).Tables.length > 0 && 
-                    (response as any).Tables[0].Rows || [];
-      const rows = result.map((_, i) => (
-        <TableRow key={i}>
-          {_.map(val => (<TableColumn>{val}</TableColumn>))}
-        </TableRow>
-      ));
-
-      return rows;
-    };
-
     return (
       <div>
         <SelectionControl
@@ -67,19 +53,14 @@ export default class DataVisualization extends React.Component<IDataVisualizatio
               <CircularProgress id="testerProgress" />
             </div>
           )) || 
-          ((this.props.renderAs === 'table') && (
-            <Collapse collapsed={!this.state.showResult}>
-              <div style={{ background: 'white',
-                            border: '1px',
-                            borderStyle: 'groove'
-                        }}>
-                <DataTable plain>
-                  <TableBody>
-                    {mapResult(this.props.queryResponse)}
-                  </TableBody>
-                </DataTable>
-              </div>
-            </Collapse>
+          (
+            (this.props.renderAs === 'table') && (
+                <TimelineVisual id={this.props.id}
+                                queryResponse={this.props.queryResponse}
+                                renderAs={this.props.renderAs}
+                                onRenderChanged={this.onRenderChanged.bind(this)}
+                                showDataVisual={this.state.showResult}
+                />
           ))
         }
       </div>      
